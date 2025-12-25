@@ -1,0 +1,15 @@
+[package]
+name = "rust_spring"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [
+    "rspring",
+    "rspring_macro",
+    "myapp"
+]
+
+[dependencies]
+
+
