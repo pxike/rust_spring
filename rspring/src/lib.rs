@@ -3,6 +3,7 @@ use std::sync::Arc;
 use std::collections::HashMap;
 use std::any::{Any, TypeId};
 
+pub use axum;
 pub use inventory;
 
 #[derive(Debug)]
@@ -110,13 +111,14 @@ mod runtime {
     use axum::Router;
     use tokio::net::TcpListener;
     use crate::{inventory, Route, ServiceContainer};
+    use axum::Extension;
     
     pub fn run(addr: String) {
         let rt = tokio::runtime::Runtime::new().unwrap();
 
         rt.block_on(async move {
             // Build all components
-            let _container = ServiceContainer::build();
+            let container = ServiceContainer::build();
             
             let mut router = Router::new();
 
@@ -124,6 +126,9 @@ mod runtime {
                 println!("[rspring] {:#?} {}", route.method, route.path);
                 router = route.add_to_router(router);
             }
+
+            // Add the container as an extension so handlers can access it
+            router = router.layer(Extension(container));
 
             let listener = TcpListener::bind(&addr).await.unwrap();
             println!("[rspring] Server running on http://{}", addr);
