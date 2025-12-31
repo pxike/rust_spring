@@ -267,7 +267,12 @@ fn controller_impl_macro(mut input: ItemImpl) -> TokenStream {
                     (quote! { rspring::Method::DELETE }, quote! { rspring::axum::routing::delete })
                 };
 
-                let wrapper_name = quote::format_ident!("{}_handler", method_name);
+                let struct_name = if let Type::Path(type_path) = &*self_ty {
+                    type_path.path.segments.last().unwrap().ident.to_string()
+                } else {
+                    "controller".to_string()
+                };
+                let wrapper_name = quote::format_ident!("{}_{}_handler", struct_name.to_lowercase(), method_name);
                 let mut wrapper_args = Vec::new();
                 let mut call_args = Vec::new();
                 
